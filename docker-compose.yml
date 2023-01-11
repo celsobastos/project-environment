@@ -1,0 +1,111 @@
+version: "3"
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    image: celso/nginx
+    container_name: nginx
+    ports:
+      - "80:8080"
+    networks:
+      - net-local
+    volumes:
+      - ./:/var/www/html
+      - ./logs/nginx:/var/log/nginx/
+    depends_on:
+      - php-server-01
+      - php-server-02
+      - php-server-03
+  php-server-01:
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    image: celso/php-server-01
+    container_name: php-server-01
+    working_dir: /var/www/html/
+    # environment:
+    #   USUARIO: 'root-01'
+    #   SENHA: 'password'
+    #   JDBC_CONNECTION_STRING: 'jdbc:mysql://beanstalk_mysql:3306/casadocodigo'
+    env_file:
+        - ./.env
+    volumes:
+      - ./:/var/www/html
+      # - ./logs/php/performance:/var/www/html/performance
+      # - ./logs/php:/var/log/
+    networks:
+      - net-local
+  php-server-02:
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    # This local machine will be host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    image: celso/php-server-02
+    container_name: php-server-02
+    working_dir: /var/www/html/
+    # environment:
+    #   USUARIO: 'root-02'
+    #   SENHA: 'password'
+    #   JDBC_CONNECTION_STRING: 'jdbc:mysql://beanstalk_mysql:3306/casadocodigo'
+    env_file:
+        - ./.env
+    volumes:
+      - ./:/var/www/html
+      # - ./logs/php:/var/log/
+    networks:
+      - net-local
+  php-server-03:
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    image: celso/php-server-03
+    container_name: php-server-03
+    working_dir: /var/www/html/
+    # environment:
+    #   USUARIO: 'root-03'
+    #   SENHA: 'password'
+    #   JDBC_CONNECTION_STRING: 'jdbc:mysql://beanstalk_mysql:3306/casadocodigo'
+    env_file:
+        - ./.env
+    volumes:
+      - ./:/var/www/html
+      # - ./logs/php:/var/log/
+    networks:
+      - net-local
+  mysql:
+    image: mysql/mysql-server:5.7
+    container_name: mysql
+    ports:
+      - "3307:3306"
+    # environment:
+    #   MYSQL_DATABASE: "projeto"
+    #   MYSQL_USER: "root"
+    #   MYSQL_PASSWORD: "123456"
+    #   MYSQL_ROOT_PASSWORD: "123456"
+    #   SERVICE_TAGS: dev
+    #   SERVICE_NAME: mysql
+    volumes:
+      - ./mysql/dbdata:/var/lib/mysql/
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - net-local
+#   phpmyadmin:
+    #   image: phpmyadmin
+    #   container_name: phpmyadmin
+    #   PMA_HOST: mysql # - define address/host name of the MySQL server
+    #   PMA_PORT: 3306  # - define port of the MySQL server
+    #   restart: always
+    #   ports:
+    #     - 8081:80
+    #   environment:
+    #     - PMA_ARBITRARY=1
+networks:
+  net-local:
+    driver: bridge

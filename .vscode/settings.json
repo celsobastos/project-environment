@@ -1,0 +1,11 @@
+{
+  "phpSniffer.autoDetect": true,
+  "phpSniffer.executablesFolder": "/home/celso/projeto-docker-php/vendor/bin/",
+  "[php]": {
+    "editor.defaultFormatter": "wongjn.php-sniffer",
+    "editor.formatOnSave": true
+  },
+  "phpSniffer.standard": "Drupal",
+  "phpSniffer.run": "onSave",
+  "editor.formatOnSave": false
+}
